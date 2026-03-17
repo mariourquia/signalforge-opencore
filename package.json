@@ -1,0 +1,13 @@
+{
+  "name": "signalforge-opencore",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Open-core DSL compiler for quantitative investment strategy formulas",
+  "packageManager": "pnpm@10.12.1",
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint"
+  }
+}
