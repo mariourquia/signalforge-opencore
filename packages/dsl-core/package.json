@@ -1,0 +1,53 @@
+{
+  "name": "@signalforge/dsl-core",
+  "private": false,
+  "version": "0.1.0",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mariourquia/signalforge-opencore.git",
+    "directory": "packages/dsl-core"
+  },
+  "homepage": "https://github.com/mariourquia/signalforge-opencore/tree/main/packages/dsl-core",
+  "bugs": {
+    "url": "https://github.com/mariourquia/signalforge-opencore/issues"
+  },
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./parser": {
+      "types": "./dist/parser.d.ts",
+      "import": "./dist/parser.js"
+    },
+    "./ast": {
+      "types": "./dist/ast.d.ts",
+      "import": "./dist/ast.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "25.5.0",
+    "eslint": "9.39.4",
+    "fast-check": "4.6.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.57.0",
+    "vitest": "4.1.0"
+  }
+}

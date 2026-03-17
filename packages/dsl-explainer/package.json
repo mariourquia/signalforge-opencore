@@ -1,0 +1,46 @@
+{
+  "name": "@signalforge/dsl-explainer",
+  "private": false,
+  "version": "0.1.0",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mariourquia/signalforge-opencore.git",
+    "directory": "packages/dsl-explainer"
+  },
+  "homepage": "https://github.com/mariourquia/signalforge-opencore/tree/main/packages/dsl-explainer",
+  "bugs": {
+    "url": "https://github.com/mariourquia/signalforge-opencore/issues"
+  },
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@signalforge/dsl-core": "workspace:*"
+  },
+  "devDependencies": {
+    "eslint": "9.39.4",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.57.0",
+    "vitest": "4.1.0"
+  }
+}
