@@ -57,6 +57,12 @@ describe("buildProjectionCte", () => {
     expect(result2.columns).toContain("zscore_cs_vol_20d");
   });
 
+  it("adds rank columns when rank is required", () => {
+    const result = buildProjectionCte(["ret_126d"], ["rank"]);
+    expect(result.sql).toContain("rank_ret_126d");
+    expect(result.columns).toContain("rank_ret_126d");
+  });
+
   it("rejects invalid field names in projection", () => {
     expect(() => buildProjectionCte(["bad'; DROP"], [])).toThrow("Invalid field name");
   });
@@ -229,10 +235,33 @@ describe("buildStepCte", () => {
     });
 
     describe("special functions", () => {
-      it("rank is a no-op (v1 compat)", () => {
+      it("rank replaces top of stack with rank_{field} payload lookup", () => {
+        const step: ExecutionStep = { op: "call", fn: "rank", arity: 1 };
+        const result = buildStepCte(1, step, { depth: 1, prevField: "ret_126d" });
+        expect(result.sql).toContain("rank_ret_126d AS s1");
+        expect(result.newDepth).toBe(1);
+        expect(result.prevField).toBeNull();
+      });
+
+      it("rank uses JOIN back to projected for lookup", () => {
+        const step: ExecutionStep = { op: "call", fn: "rank", arity: 1 };
+        const result = buildStepCte(3, step, { depth: 1, prevField: "vol_20d" });
+        expect(result.sql).toContain("p.rank_vol_20d AS s1");
+        expect(result.sql).toContain("JOIN projected p");
+      });
+
+      it("rank carries lower stack columns with JOIN", () => {
+        const step: ExecutionStep = { op: "call", fn: "rank", arity: 1 };
+        const result = buildStepCte(5, step, { depth: 2, prevField: "vol_20d" });
+        expect(result.sql).toContain("s.s1");
+        expect(result.sql).toContain("p.rank_vol_20d AS s2");
+        expect(result.sql).toContain("JOIN projected p");
+      });
+
+      it("rank returns NULL when prevField is null", () => {
         const step: ExecutionStep = { op: "call", fn: "rank", arity: 1 };
         const result = buildStepCte(2, step, { depth: 1, prevField: null });
-        expect(result.sql).toContain("s1");
+        expect(result.sql).toContain("NULL::numeric AS s1");
         expect(result.newDepth).toBe(1);
       });
 

@@ -88,6 +88,11 @@ export function buildProjectionCte(
       validateFieldName(col);
       columns.push(col);
     }
+    if (requiredFunctions.includes("rank")) {
+      const col = `rank_${field}`;
+      validateFieldName(col);
+      columns.push(col);
+    }
   }
 
   const colLines = columns
@@ -225,11 +230,25 @@ function buildCallStepCte(
   const mathResult = buildMathCallCte(fn, arity, state, prevCte);
   if (mathResult !== null) return mathResult;
 
-  // rank: no-op (v1 compat — 022 had rank_{field} lookup, 026 dropped it. Restore in Phase 3.)
   if (fn === "rank") {
-    const carry = carryColumns(state.depth, "");
-    const sql = `SELECT symbol, ${carry} FROM ${prevCte}`;
-    return { sql, newDepth: state.depth, prevField: null};
+    const depth = state.depth;
+    if (state.prevField === null) {
+      const carry = carryColumns(depth - 1, "");
+      const selectCols = depth > 1 ? `${carry}, NULL::numeric AS s${depth}` : `NULL::numeric AS s${depth}`;
+      const sql = `SELECT symbol, ${selectCols} FROM ${prevCte}`;
+      return { sql, newDepth: depth, prevField: null };
+    }
+    const lookupCol = `rank_${state.prevField}`;
+    let sql: string;
+    if (depth === 1 && stepIndex === 0) {
+      sql = `SELECT symbol, ${lookupCol} AS s1 FROM projected`;
+    } else if (depth === 1 && stepIndex > 0) {
+      sql = `SELECT s.symbol, p.${lookupCol} AS s1 FROM ${prevCte} s JOIN projected p ON p.symbol = s.symbol`;
+    } else {
+      const carry = carryColumns(depth - 1, "s");
+      sql = `SELECT s.symbol, ${carry}, p.${lookupCol} AS s${depth} FROM ${prevCte} s JOIN projected p ON p.symbol = s.symbol`;
+    }
+    return { sql, newDepth: depth, prevField: null };
   }
 
   // lag: MVP stub — pop arity-1, replace top with NULL
