@@ -30,7 +30,6 @@ interface StepCteResult {
   readonly sql: string;
   readonly newDepth: number;
   readonly prevField: string | null;
-  readonly needsProjectedJoin: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -135,7 +134,7 @@ export function buildStepCte(
           `SELECT s.symbol, ${carry}, p.${step.field} AS s${newDepth}` +
           ` FROM ${prevCte} s JOIN projected p ON p.symbol = s.symbol`;
       }
-      return { sql, newDepth, prevField: step.field, needsProjectedJoin: stepIndex > 0 };
+      return { sql, newDepth, prevField: step.field};
     }
 
     case "literal": {
@@ -148,7 +147,7 @@ export function buildStepCte(
         const carry = carryColumns(state.depth, "");
         sql = `SELECT symbol, ${carry}, ${lit} AS s${newDepth} FROM ${prevCte}`;
       }
-      return { sql, newDepth, prevField: null, needsProjectedJoin: false };
+      return { sql, newDepth, prevField: null};
     }
 
     case "binary": {
@@ -162,7 +161,7 @@ export function buildStepCte(
       const carry = carryColumns(newDepth - 1, "");
       const selectCols = newDepth > 1 ? `${carry}, (${expr}) AS s${newDepth}` : `(${expr}) AS s${newDepth}`;
       const sql = `SELECT symbol, ${selectCols} FROM ${prevCte}`;
-      return { sql, newDepth, prevField: null, needsProjectedJoin: false };
+      return { sql, newDepth, prevField: null};
     }
 
     case "nary": {
@@ -175,7 +174,7 @@ export function buildStepCte(
       const carry = carryColumns(newDepth - 1, "");
       const selectCols = newDepth > 1 ? `${carry}, (${operands}) AS s${newDepth}` : `(${operands}) AS s${newDepth}`;
       const sql = `SELECT symbol, ${selectCols} FROM ${prevCte}`;
-      return { sql, newDepth, prevField: null, needsProjectedJoin: false };
+      return { sql, newDepth, prevField: null};
     }
 
     case "call": {
@@ -201,7 +200,7 @@ function buildCallStepCte(
       const carry = carryColumns(depth - 1, "");
       const selectCols = depth > 1 ? `${carry}, NULL::numeric AS s${depth}` : `NULL::numeric AS s${depth}`;
       const sql = `SELECT symbol, ${selectCols} FROM ${prevCte}`;
-      return { sql, newDepth: depth, prevField: null, needsProjectedJoin: false };
+      return { sql, newDepth: depth, prevField: null};
     }
 
     const lookupCol = `${prefix}_${state.prevField}`;
@@ -219,7 +218,7 @@ function buildCallStepCte(
         ` FROM ${prevCte} s JOIN projected p ON p.symbol = s.symbol`;
     }
 
-    return { sql, newDepth: depth, prevField: null, needsProjectedJoin: true };
+    return { sql, newDepth: depth, prevField: null};
   }
 
   // Pure math functions
@@ -230,7 +229,7 @@ function buildCallStepCte(
   if (fn === "rank") {
     const carry = carryColumns(state.depth, "");
     const sql = `SELECT symbol, ${carry} FROM ${prevCte}`;
-    return { sql, newDepth: state.depth, prevField: null, needsProjectedJoin: false };
+    return { sql, newDepth: state.depth, prevField: null};
   }
 
   // lag: MVP stub — pop arity-1, replace top with NULL
@@ -239,14 +238,14 @@ function buildCallStepCte(
     const carry = carryColumns(newDepth - 1, "");
     const selectCols = newDepth > 1 ? `${carry}, NULL::numeric AS s${newDepth}` : `NULL::numeric AS s${newDepth}`;
     const sql = `SELECT symbol, ${selectCols} FROM ${prevCte}`;
-    return { sql, newDepth, prevField: null, needsProjectedJoin: false };
+    return { sql, newDepth, prevField: null};
   }
 
   // Unknown function: v1 compat — pop arity-1, leave top unchanged
   const newDepth = state.depth - arity + 1;
   const carry = carryColumns(newDepth, "");
   const sql = `SELECT symbol, ${carry} FROM ${prevCte}`;
-  return { sql, newDepth, prevField: null, needsProjectedJoin: false };
+  return { sql, newDepth, prevField: null};
 }
 
 function buildMathCallCte(
@@ -295,7 +294,7 @@ function buildMathCallCte(
   const carry = carryColumns(newDepth - 1, "");
   const selectCols = newDepth > 1 ? `${carry}, ${expr} AS s${newDepth}` : `${expr} AS s${newDepth}`;
   const sql = `SELECT symbol, ${selectCols} FROM ${prevCte}`;
-  return { sql, newDepth, prevField: null, needsProjectedJoin: false };
+  return { sql, newDepth, prevField: null};
 }
 
 // ---------------------------------------------------------------------------
