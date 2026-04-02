@@ -4,3 +4,11 @@ dist/
 *.tsbuildinfo
 .env
 .env.local
+.env.*
+
+# Secrets and credentials
+*.pem
+*.key
+*.p12
+credentials.json
+serviceAccountKey.json
