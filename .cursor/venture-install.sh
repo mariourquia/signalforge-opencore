@@ -3,5 +3,34 @@
 # Secret values do not belong in this file.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-corepack enable
+
+# vitest 4.1 engines: ^20.19.0 || >=22.12.0. .nvmrc pins 22.
+if ! command -v node >/dev/null 2>&1; then
+  echo "error: Node.js is not installed. Required: ^20.19.0 or >=22.12.0 (.nvmrc is 22)." >&2
+  exit 1
+fi
+
+node_version="$(node -p 'process.versions.node')"
+node_major="${node_version%%.*}"
+node_rest="${node_version#*.}"
+node_minor="${node_rest%%.*}"
+
+node_ok=0
+if [ "$node_major" -eq 20 ] && [ "$node_minor" -ge 19 ]; then
+  node_ok=1
+elif [ "$node_major" -eq 22 ] && [ "$node_minor" -ge 12 ]; then
+  node_ok=1
+elif [ "$node_major" -ge 23 ]; then
+  node_ok=1
+fi
+
+if [ "$node_ok" -ne 1 ]; then
+  echo "error: Node ${node_version} is too old. vitest 4.1 requires ^20.19.0 or >=22.12.0. Use Node 22 (.nvmrc)." >&2
+  exit 1
+fi
+
+local_bin="${HOME}/.local/bin"
+mkdir -p "$local_bin"
+export PATH="${local_bin}:${PATH}"
+corepack enable --install-directory "$local_bin"
 pnpm install --frozen-lockfile
