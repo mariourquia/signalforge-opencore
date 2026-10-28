@@ -1,0 +1,82 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`compileExecutionPlan > snapshots > snapshot: addition 1`] = `
+[
+  {
+    "field": "ret_1d",
+    "op": "load_field",
+  },
+  {
+    "field": "vol_20d",
+    "op": "load_field",
+  },
+  {
+    "count": 2,
+    "op": "nary",
+    "operator": "+",
+  },
+]
+`;
+
+exports[`compileExecutionPlan > snapshots > snapshot: complex expression 1`] = `
+[
+  {
+    "field": "ret_1d",
+    "op": "load_field",
+  },
+  {
+    "arity": 1,
+    "fn": "zscore_ts",
+    "op": "call",
+  },
+  {
+    "field": "vol_20d",
+    "op": "load_field",
+  },
+  {
+    "arity": 1,
+    "fn": "rank",
+    "op": "call",
+  },
+  {
+    "op": "literal",
+    "value": 0.5,
+  },
+  {
+    "count": 2,
+    "op": "nary",
+    "operator": "*",
+  },
+  {
+    "count": 2,
+    "op": "nary",
+    "operator": "+",
+  },
+]
+`;
+
+exports[`compileExecutionPlan > snapshots > snapshot: division 1`] = `
+[
+  {
+    "field": "ret_1d",
+    "op": "load_field",
+  },
+  {
+    "field": "vol_20d",
+    "op": "load_field",
+  },
+  {
+    "op": "binary",
+    "operator": "/",
+  },
+]
+`;
+
+exports[`compileExecutionPlan > snapshots > snapshot: simple field 1`] = `
+[
+  {
+    "field": "ret_1d",
+    "op": "load_field",
+  },
+]
+`;
