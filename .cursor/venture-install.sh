@@ -3,5 +3,9 @@
 # Secret values do not belong in this file.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-corepack enable
-pnpm install --no-frozen-lockfile
+# shellcheck source=ensure-node.sh
+source "$(dirname "$0")/ensure-node.sh"
+hash -r
+"${SIGNALFORGE_NODE_BIN}/corepack" enable --install-directory "${HOME}/.local/bin"
+hash -r
+pnpm install --frozen-lockfile

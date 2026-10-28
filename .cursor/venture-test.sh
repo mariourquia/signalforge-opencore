@@ -3,5 +3,9 @@
 # Secret values do not belong in this file.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# shellcheck source=ensure-node.sh
+source "$(dirname "$0")/ensure-node.sh"
+hash -r
+pnpm build
 pnpm test
 pnpm typecheck
