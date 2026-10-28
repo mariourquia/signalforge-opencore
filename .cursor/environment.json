@@ -1,0 +1,8 @@
+{
+  "name": "SignalForge / signalforge-opencore",
+  "user": "ubuntu",
+  "install": "bash .cursor/venture-install.sh",
+  "repositoryDependencies": [
+    "github.com/mariourquia/signalforge"
+  ]
+}
